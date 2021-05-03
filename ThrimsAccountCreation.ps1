@@ -4,7 +4,7 @@
 .DESCRIPTION
     
 .NOTES
-    Generated On: 02/05/2021
+    Generated On: 03/05/2021
     Author: James Taylor
 #>
 Import-Module ActiveDirectory
@@ -24,27 +24,29 @@ $Surname = Read-Host "Enter the users surname"
 $Org = Read-Host "Enter users agency"
 
 ### Static Variables ###
-$UserPrincipalName = "$SamAccountName@communities.wa.gov.au"
-$Server = "vwpdcrw0003.dhw.wa.gov.au"
+$UserPrincipalName = "$SamAccountName@james.local"
+$Server = "james.local"
 $DisplayName = "$GivenName $Surname"
 $Name = $DisplayName
 $Admin = $env:UserName
 $Today = Get-Date -Format "dd/MM/yyyy"
 $Notes = "Created $Today $RITM $Admin"
-
+$Group = "External Domain Users","APP_THRIMS_USERS"
 $Password = ConvertTo-SecureString "1NewFusion" -AsPlainText -Force
 
-$ExternalPath = "OU=External_Domain_Users,OU=WXP_DMZ,OU=Housing,DC=dhw,DC=wa,DC=gov,DC=au"
+$ExternalPath = "OU=ExternalDomainUsers,OU=Accounts,DC=james,DC=local"
 
 
 New-ADUser -GivenName $GivenName -Surname $Surname `
 -SamAccountName $SamAccountName -DisplayName $DisplayName `
 -Name $Name -UserPrincipalName $UserPrincipalName -Path $ExternalPath `
--PasswordNeverExpires $True -AccountPassword $Password -Enabled $True `
+-PasswordNeverExpires $false -AccountPassword $Password -Enabled $True `
 -ChangePasswordAtLogon $True -Server $Server -Office $Org
-Add-ADGroupMember -Identity APP_THRIMS_USERS -Members $SamAccountName
+Add-ADPrincipalGroupMembership $SamAccountName  -MemberOf  $Group
 Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External Thrims'}
 
+Get-ADUser $SamAccountName | Set-ADObject -Replace @{primaryGroupID="1124"}
+Remove-ADGroupMember -Identity "Domain Users" -Members $SamAccountName
 Set-ADUser -Identity $SamAccountName -Replace @{info="$Notes;"}
 
 Write-Host = Get-ADUser $SamAccountName | Select-Object DisplayName,UserPrincipalName,SamAccountName
