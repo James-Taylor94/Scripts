@@ -41,7 +41,8 @@ New-ADUser -GivenName $GivenName -Surname $Surname `
 -SamAccountName $SamAccountName -DisplayName $DisplayName `
 -Name $Name -UserPrincipalName $UserPrincipalName -Path $ExternalPath `
 -PasswordNeverExpires $false -AccountPassword $Password -Enabled $True `
--ChangePasswordAtLogon $True -Server $Server -Office $Org
+-ChangePasswordAtLogon $True -Server $Server -Office $Org `
+-Company $Org
 Add-ADPrincipalGroupMembership $SamAccountName  -MemberOf  $Group
 Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External Thrims'}
 
