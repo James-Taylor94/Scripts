@@ -36,14 +36,14 @@ $Notes = "Created $Today $RITM $Admin"
 $FusionPassword = ConvertTo-SecureString "1NewFusion" -AsPlainText -Force
 $TriagePassword = ConvertTo-SecureString "1NewTriage" -AsPlainText -Force
 
-$FusionPath = "OU=DVIR,OU=NGO,OU=External Users,OU=Core Infrastructure,DC=ad,DC=dcd,DC=wa,DC=gov,DC=au"
-$TriagePath = "OU=FSN,OU=NGO,OU=External Users,OU=Core Infrastructure,DC=ad,DC=dcd,DC=wa,DC=gov,DC=au"
+$TriagePath = "OU=DVIR,OU=NGO,OU=External Users,OU=Core Infrastructure,DC=ad,DC=dcd,DC=wa,DC=gov,DC=au"
+$FusionPath = "OU=FSN,OU=NGO,OU=External Users,OU=Core Infrastructure,DC=ad,DC=dcd,DC=wa,DC=gov,DC=au"
 
 If ($AccountType -like "Fusion") {
     New-ADUser -GivenName $GivenName -Surname $Surname `
     -SamAccountName $SamAccountName -DisplayName $DisplayName `
     -Name $Name -UserPrincipalName $UserPrincipalName -Path $FusionPath `
-    -PasswordNeverExpires $True -AccountPassword $FusionPassword -Enabled $True `
+    -AccountPassword $FusionPassword -Enabled $True `
     -ChangePasswordAtLogon $True -Server $Server -Office $Org
     Add-ADGroupMember -Identity GBL_FSN_ThirdParty_Users -Members $SamAccountName
     Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External Fusion'}
@@ -51,12 +51,12 @@ If ($AccountType -like "Fusion") {
     New-ADUser -GivenName $GivenName -Surname $Surname `
     -SamAccountName $SamAccountName -DisplayName $DisplayName `
     -Name $Name -UserPrincipalName $UserPrincipalName -Path $TriagePath `
-    -PasswordNeverExpires $True -AccountPassword $TriagePassword -Enabled $True `
+    -AccountPassword $TriagePassword -Enabled $True `
     -ChangePasswordAtLogon $True -Server $Server -Office $Org
-    Add-ADGroupMember -Identity GBL_DVIR_ThirdParty_Users -Members $SamAccountName
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External DVIR'}
+    Add-ADGroupMember -Identity GBL_Fusion -Members $SamAccountName -Server $Server
+    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External DVIR'} -Server $Server
 }
 
-Set-ADUser -Identity $SamAccountName -Replace @{info="$Notes;"}
+Set-ADUser -Identity $SamAccountName -Replace @{info="$Notes;"} -Server $Server
 
 Write-Host = Get-ADUser $SamAccountName | Select-Object DisplayName,UserPrincipalName,SamAccountName
