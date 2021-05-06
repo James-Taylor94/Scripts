@@ -15,7 +15,7 @@ $SamAccountName = Read-Host "Enter the SamAccountName"
 $USER = Get-ADUser -Identity $SamAccountName | Select-Object -ExpandProperty UserPrincipalName
     if ($USER) {
         Write-Host "$USER already has taken $SamAccountName" -ForegroundColor Red
-     } else {
+     } elseif (!$USER) {
         Write-Host "$SamAccountName is availble" -ForegroundColor Green
     }
 
@@ -24,17 +24,17 @@ $Surname = Read-Host "Enter the users surname"
 $Org = Read-Host "Enter users agency"
 
 ### Static Variables ###
-$UserPrincipalName = "$SamAccountName@james.local"
-$Server = "james.local"
+$UserPrincipalName = "$SamAccountName@communities.wa.gov.au"
+$Server = "vwpdcrw0003.dhw.wa.gov.au"
 $DisplayName = "$GivenName $Surname"
-$Name = $DisplayName
+$Name = $SamAccountName
 $Admin = $env:UserName
 $Today = Get-Date -Format "dd/MM/yyyy"
 $Notes = "Created $Today $RITM $Admin"
 $Group = "External Domain Users","APP_THRIMS_USERS"
-$Password = ConvertTo-SecureString "1NewFusion" -AsPlainText -Force
+$Password = ConvertTo-SecureString "FastAaron12" -AsPlainText -Force
 
-$ExternalPath = "OU=ExternalDomainUsers,OU=Accounts,DC=james,DC=local"
+$ExternalPath = "OU=External_Domain_Users,OU=WXP_DMZ,OU=Housing,DC=dhw,DC=wa,DC=gov,DC=au"
 
 
 New-ADUser -GivenName $GivenName -Surname $Surname `
@@ -43,11 +43,14 @@ New-ADUser -GivenName $GivenName -Surname $Surname `
 -PasswordNeverExpires $false -AccountPassword $Password -Enabled $True `
 -ChangePasswordAtLogon $True -Server $Server -Office $Org `
 -Company $Org
-Add-ADPrincipalGroupMembership $SamAccountName  -MemberOf  $Group
-Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External Thrims'}
+Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $Group -Server $Server
 
-Get-ADUser $SamAccountName | Set-ADObject -Replace @{primaryGroupID="1124"}
-Remove-ADGroupMember -Identity "Domain Users" -Members $SamAccountName
-Set-ADUser -Identity $SamAccountName -Replace @{info="$Notes;"}
+Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External Thrims'} -Server $Server
+
+$PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
+Set-ADUser $SamAccountName -replace @{primaryGroupID=$PrimaryGroup.primaryGroupToken} -Server $Server
+Remove-ADGroupMember -Identity "Domain Users" -Members $SamAccountName -Server $Server
+
+Set-ADUser -Identity $SamAccountName -Replace @{info="$Notes;"} -Server $Server
 
 Write-Host = Get-ADUser $SamAccountName | Select-Object DisplayName,UserPrincipalName,SamAccountName
