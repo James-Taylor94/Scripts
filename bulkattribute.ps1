@@ -1,9 +1,9 @@
 ﻿Import-Module ActiveDirectory
-$Users = Get-Content -Path "C:\temp\sAMAccountname.txt"
+$Users = Get-Content -Path "C:\temp\Imports\BulkEndDate.txt"
 $ErrorActionPreference = 'Stop'
 
 foreach ($User in $Users) {
-    Set-ADUser -Identity $user -Office 'Wanslea -Verbose'
+    Set-ADAccountExpiration -Identity $User -DateTime "08/09/2022" -Verbose
 }
 
-Write-Host "Accounts successfully udpated"
+Write-Host "End date successfully updated"

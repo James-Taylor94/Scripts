@@ -30,7 +30,7 @@ $ExternalEmail = Read-Host "Enter the external email address"
 
 ### Static Variables ###
 $UserPrincipalName = "$SamAccountName@communities.wa.gov.au"
-$Server = "james.local"
+$Server = "vwpdcrw0003.dhw.wa.gov.au"
 $DisplayName = "$GivenName $Surname"
 $Name = $DisplayName
 $Admin = $env:UserName
@@ -39,13 +39,13 @@ $Notes = "Created $Today $RITM $Admin"
 
 $AccountPassword = ConvertTo-SecureString "FastAaron12" -AsPlainText -Force
 
-$MWW_Group = "APP_POWERBI_RLS_RSP-MWW-DER_USERS", "Role-User-External-RSP.MarraWorraWorra", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline"
-$EmamaNgudaGroup = "APP_POWERBI_RLS_RSP-EN-DER_USERS", "Role-User-External-RSP.EmamaNguda", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline"
-$MowanjumGroup = "APP_POWERBI_RLS_RSP-MAC-DER_USERS", "Role-User-External-RSP.Mowanjum", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline"
-$MetaMayaGroup = "APP_POWERBI_RLS_RSP-PMM-HED_USERS", "Role-User-External-RSP.PilbaraMetaMaya", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline"
-$CommunityHousingKununurraGroups = "APP_POWERBI_RLS_RSP-CHL-KUN_USERS", "Role-User-External-RSP.CommunityHousingLTD", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline"
-$CommunityHousingKalgoorlieGroups = "APP_POWERBI_RLS_RSP-CHL-KAL_USERS", "Role-User-External-RSP.CommunityHousingLTD", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline"
-$NgaanyatjarraGroups = "APP_POWERBI_RLS_RSP-NG-KAL_USERS", "Role-User-External-RSP.Ngaanyatjarra", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline"
+$MWW_Group = "APP_POWERBI_RLS_RSP-MWW-DER_USERS", "Role-User-External-RSP.MarraWorraWorra", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline","Auth-MFA.Azure.ExternalRegistration.Allow"
+$EmamaNgudaGroup = "APP_POWERBI_RLS_RSP-EN-DER_USERS", "Role-User-External-RSP.EmamaNguda", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline","Auth-MFA.Azure.ExternalRegistration.Allow"
+$MowanjumGroup = "APP_POWERBI_RLS_RSP-MAC-DER_USERS", "Role-User-External-RSP.Mowanjum", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline","Auth-MFA.Azure.ExternalRegistration.Allow"
+$MetaMayaGroup = "APP_POWERBI_RLS_RSP-PMM-HED_USERS", "Role-User-External-RSP.PilbaraMetaMaya", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline","Auth-MFA.Azure.ExternalRegistration.Allow"
+$CommunityHousingKununurraGroups = "APP_POWERBI_RLS_RSP-CHL-KUN_USERS", "Role-User-External-RSP.CommunityHousingLTD", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline","Auth-MFA.Azure.ExternalRegistration.Allow"
+$CommunityHousingKalgoorlieGroups = "APP_POWERBI_RLS_RSP-CHL-KAL_USERS", "Role-User-External-RSP.CommunityHousingLTD", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline","Auth-MFA.Azure.ExternalRegistration.Allow"
+$NgaanyatjarraGroups = "APP_POWERBI_RLS_RSP-NG-KAL_USERS", "Role-User-External-RSP.Ngaanyatjarra", "External Domain Users", "App-Microsoft-Office365-Communities.SecurityBaseline","Auth-MFA.Azure.ExternalRegistration.Allow"
 
 $Path = "OU=External_Domain_Users,OU=WXP_DMZ,OU=Housing,DC=dhw,DC=wa,DC=gov,DC=au"
 
@@ -57,7 +57,6 @@ If ($AccountType -like "Marra Worra Worra") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $MWW_Group -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' }
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -71,7 +70,6 @@ elseif ($AccountType -like "Emama Nguda") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $EmamaNgudaGroup -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -85,7 +83,6 @@ elseif ($AccountType -like "Mowanjum") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $MowanjumGroup -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -99,7 +96,6 @@ elseif ($AccountType -like "Pilbara Meta Maya") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $MetaMayaGroup -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -113,7 +109,6 @@ elseif ($AccountType -like "CHL - KUN") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $CommunityHousingKununurraGroups -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -127,7 +122,6 @@ elseif ($AccountType -like "CHL - KAL") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $CommunityHousingKalgoorlieGroups -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -141,7 +135,6 @@ elseif ($AccountType -like "CHL - KAL") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $CommunityHousingKalgoorlieGroups -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -154,7 +147,6 @@ elseif ($AccountType -like "CHL - KAL") {
         -ChangePasswordAtLogon $True -Server $Server -Office $Org `
         -Company $Org -EmailAddress $ExternalEmail -Title $JobTitle -Manager $Manager
     Add-ADPrincipalGroupMembership $SamAccountName -MemberOf  $NgaanyatjarraGroups -Server $Server
-    Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 
     $PrimaryGroup = Get-ADGroup "External Domain Users" -properties @("primaryGroupToken")
     Set-ADUser $SamAccountName -replace @{primaryGroupID = $PrimaryGroup.primaryGroupToken } -Server $Server
@@ -164,7 +156,7 @@ else {
     Add-LogEntry -LogLevel Error -LogEntry "Account type variable not valid, exiting script"
     Exit
 }
-
+Set-ADUser -Identity $SamAccountName -Replace @{employeeType = 'External RSP' } -Server $Server
 Set-ADUser -Identity $SamAccountName -Replace @{info = "$Notes;" } -Server $Server
 
-Write-Host = Get-ADUser $SamAccountName | Select-Object DisplayName, UserPrincipalName, SamAccountName
+Write-Host "$SamAccountName has been created"

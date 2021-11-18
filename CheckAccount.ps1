@@ -1,0 +1,6 @@
+Import-Module ActiveDirectory
+
+$User = Read-Host "Please enter the username"
+Get-ADUser -Identity $User -Server ho-pth-dc03.dhw.wa.gov.au -Properties * | select name, distinguishedName, sn, givenName, samaccountname, title, userPrincipalName, mail, whenCreated, @{name ="lastLogonTimestamp"; expression={[datetime]::FromFileTime($_.pwdLastSet)}}, @{name ="pwdLastSet"; expression={[datetime]::FromFileTime($_.pwdLastSet)}}
+Get-ADUser -Identity $User -Server dc01sv962.ad.dcd.wa.gov.au -Properties * | select name, distinguishedName, sn, givenName, samaccountname, title, userPrincipalName, mail, whenCreated, @{name ="lastLogonTimestamp"; expression={[datetime]::FromFileTime($_.pwdLastSet)}}, @{name ="pwdLastSet"; expression={[datetime]::FromFileTime($_.pwdLastSet)}} 
+Get-ADUser -Identity $User -Server wpdc01.dsc.wa.gov.au -Properties * | select name, distinguishedName, sn, givenName, samaccountname, title, userPrincipalName, mail, whenCreated, @{name ="lastLogonTimestamp"; expression={[datetime]::FromFileTime($_.pwdLastSet)}}, @{name ="pwdLastSet"; expression={[datetime]::FromFileTime($_.pwdLastSet)}}
